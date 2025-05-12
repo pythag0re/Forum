@@ -27,8 +27,14 @@ func Start() {
 	db.InitDB()
 	defer db.CloseDB()
 
-	http.Handle("/css/", http.StripPrefix("/css", http.FileServer(http.Dir("_template_/css"))))
+	http.Handle("/css/", http.StripPrefix("/css", http.FileServer(http.Dir("_templates_/css"))))
 	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("_templates_/"))))
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/home", http.StatusSeeOther)
+	})
+
+	http.HandleFunc("/home", homeHandler)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
