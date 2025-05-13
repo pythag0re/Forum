@@ -26,17 +26,11 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	pseudo := r.FormValue("pseudo")
 	password := r.FormValue("password")
-	confirmPassword := r.FormValue("confirm-password")
-	HasehPassword, _ := HashPassword(password)
+	hashedPassword, _ := HashPassword(password)
 
-	if password != confirmPassword {
-		fmt.Println("Les mots de passe ne correspondent pas!")
-		http.Redirect(w, r, "/register", http.StatusSeeOther)
-		return
-	}
-
+	// Vérification pseudo déjà pris
 	var existingPseudo string
-	queryCheck := "SELECT pseudo FROM players WHERE pseudo = ?"
+	queryCheck := "SELECT pseudo FROM users WHERE pseudo = ?"
 	err = db.DB.QueryRow(queryCheck, pseudo).Scan(&existingPseudo)
 
 	if err != nil && err != sql.ErrNoRows {
@@ -51,19 +45,23 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if password == "" || len(password) < 8 || len(password) > 20 || !strings.ContainsAny(password, "0123456789") || !strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") || !strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
-		fmt.Println("Le mot de passe doit contenir entre 8 et 20 caractères, au moins une lettre majuscule, une lettre minuscule et un chiffre.")
+	if password == "" || len(password) < 8 || len(password) > 20 ||
+		!strings.ContainsAny(password, "0123456789") ||
+		!strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") ||
+		!strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+		fmt.Println("Mot de passe faible")
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
 	}
 
-	queryInsert := `INSERT INTO players (email, pseudo, password) VALUES (?, ?, ?)`
-	_, err = db.DB.Exec(queryInsert, email, pseudo, HasehPassword)
+	queryInsert := `INSERT INTO users (email, pseudo, password) VALUES (?, ?, ?)`
+	_, err = db.DB.Exec(queryInsert, email, pseudo, hashedPassword)
 	if err != nil {
-		log.Println("Error inserting user:", err)
-		http.Error(w, "Error creating user", http.StatusInternalServerError)
+		log.Println("Erreur lors de l'enregistrement :", err)
+		http.Error(w, "Erreur lors de la création du compte", http.StatusInternalServerError)
 		return
 	}
 
+	fmt.Println("Inscription réussie !")
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

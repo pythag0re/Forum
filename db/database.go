@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 
@@ -16,24 +17,60 @@ func InitDB() {
 	if err != nil {
 		log.Fatal("Erreur de connexion à SQLite:", err)
 	}
-	fmt.Println("Connexion à SQLite réussie!")
+	fmt.Println("✅ Connexion à SQLite réussie !")
 
 	migrate()
 }
 
 func migrate() {
-	query := ``
+	query := `
+	CREATE TABLE IF NOT EXISTS Users (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		email TEXT NOT NULL UNIQUE,
+		password TEXT NOT NULL,
+		pseudo TEXT NOT NULL UNIQUE
+	);
+	`
 
 	_, err := DB.Exec(query)
 	if err != nil {
-		log.Fatal("Erreur lors de la migration:", err)
+		log.Fatal("❌ Erreur lors de la migration :", err)
 	}
-	fmt.Println("Tables créées avec succès!")
+	fmt.Println("✅ Table 'Users' créée ou déjà existante.")
+}
+
+func RegisterUser(email, pseudo, password string) error {
+	var exists int
+	err := DB.QueryRow(`SELECT COUNT(*) FROM Users WHERE email = ? OR pseudo = ?`, email, pseudo).Scan(&exists)
+	if err != nil {
+		return err
+	}
+	if exists > 0 {
+		return errors.New("🔁 Email ou pseudo déjà utilisé")
+	}
+
+	stmt, err := DB.Prepare("INSERT INTO Users (email, password, pseudo) VALUES (?, ?, ?)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(email, password, pseudo)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("✅ Utilisateur inscrit avec succès :", pseudo)
+	return nil
 }
 
 func CloseDB() {
 	if DB != nil {
-		DB.Close()
-		fmt.Println("Connexion SQLite fermée.")
+		err := DB.Close()
+		if err != nil {
+			log.Println("⚠️ Erreur lors de la fermeture de la base :", err)
+		} else {
+			fmt.Println("🔒 Connexion SQLite fermée.")
+		}
 	}
 }

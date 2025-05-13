@@ -14,20 +14,20 @@
 
     <div class="form-box login">
       <h2 class="title">Login</h2>
-      <form action="#">
-        <div class="input-box">
+      <form action="/login" method="POST" >
+        <div class="input-box" name="pseudo">
           <input type="text" required />
           <label>Username</label>
           <i class='bx bxs-user'></i>
         </div>
         <div class="input-box">
-          <input type="password" required />
+          <input type="password" name="password" required />
           <label>Password</label>
           <i class='bx bxs-lock-alt'></i>
         </div>
-        <button type="submit" class="btn">Login</button>
+        <button type="submit" class="btn" >Login</button>
         <div class="linkTxt">
-          <p>Don't have an account? <a href="register.html">Sign Up</a></p>
+          <p>Don't have an account? <a href="/register">Sign Up</a></p>
         </div>
       </form>
     </div>

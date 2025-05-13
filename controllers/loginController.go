@@ -24,7 +24,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 
 	var storedPseudo, storedPassword string
-	query := "SELECT pseudo, password FROM players WHERE pseudo = ?"
+	query := "SELECT pseudo, password FROM users WHERE pseudo = ?"
 	err = db.DB.QueryRow(query, pseudo).Scan(&storedPseudo, &storedPassword)
 	fmt.Println("cherche le pseudo :", pseudo)
 
@@ -51,6 +51,6 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 	http.SetCookie(w, cookie)
 
-	http.Redirect(w, r, "/game-home", http.StatusSeeOther)
+	http.Redirect(w, r, "/home", http.StatusSeeOther)
 	fmt.Println("Connexion réussie, go vers le forum")
 }
