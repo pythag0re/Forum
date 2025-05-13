@@ -26,7 +26,6 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	var storedPseudo, storedPassword string
 	query := "SELECT pseudo, password FROM players WHERE pseudo = ?"
 	err = db.DB.QueryRow(query, pseudo).Scan(&storedPseudo, &storedPassword)
-
 	fmt.Println("cherche le pseudo :", pseudo)
 
 	if err == sql.ErrNoRows {
