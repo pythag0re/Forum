@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"forum/db"
 	"forum/utils"
-	"log"
+	"golang.org/x/crypto/bcrypt"
+	"html/template"
 	"net/http"
 )
 
@@ -29,31 +30,26 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	query := "SELECT id, pseudo, password FROM users WHERE pseudo = ?"
 	err = db.DB.QueryRow(query, pseudo).Scan(&userID, &storedPseudo, &storedPassword)
-	fmt.Println("Recherche du pseudo :", pseudo)
 
 	if err == sql.ErrNoRows {
-		http.Redirect(w, r, "/register", http.StatusSeeOther)
-		fmt.Println("Utilisateur introuvable. Redirection vers l'inscription.")
+		fmt.Println("Pseudo introuvable")
+		renderLoginWithError(w, "User doesn't exist. Please sign up.")
 		return
 	} else if err != nil {
-		log.Println("Database error:", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	if storedPassword != password {
-		http.Error(w, "Incorrect password", http.StatusUnauthorized)
-		fmt.Println("Mot de passe incorrect")
+	err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(password))
+	if err != nil {
+		renderLoginWithError(w, "Incorrect password.")
 		return
 	}
 
 	sessionToken := utils.GenerateSessionToken()
-
-	
 	_, err = db.DB.Exec("INSERT INTO sessions (user_id, token) VALUES (?, ?)", userID, sessionToken)
 	if err != nil {
-		log.Println("Erreur lors de l'insertion du token :", err)
-		http.Error(w, "Erreur de session", http.StatusInternalServerError)
+		http.Error(w, "Session error", http.StatusInternalServerError)
 		return
 	}
 
@@ -65,6 +61,14 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	})
 
 	http.Redirect(w, r, "/landing", http.StatusSeeOther)
-	fmt.Println("Connexion réussie. Redirection vers le forum.")
 }
 
+func renderLoginWithError(w http.ResponseWriter, errorMsg string) {
+	tmpl := template.Must(template.ParseFiles("_templates_/login.html"))
+	data := struct {
+		Error string
+	}{
+		Error: errorMsg,
+	}
+	tmpl.Execute(w, data)
+}

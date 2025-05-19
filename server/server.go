@@ -32,11 +32,20 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/login.html"))
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		fmt.Printf("erreur de template %s:", err)
+	switch r.Method {
+	case http.MethodGet:
+		tmpl := template.Must(template.ParseFiles("_templates_/login.html"))
+		err := tmpl.Execute(w, nil)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			fmt.Printf("erreur de template : %s\n", err)
+		}
+
+	case http.MethodPost:
+		controllers.LoginUser(w, r)
+
+	default:
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 	}
 }
 
