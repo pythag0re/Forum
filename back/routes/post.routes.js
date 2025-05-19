@@ -1,16 +1,12 @@
 const express = require("express");
-const { receiveMessageOnPort } = require("worker_threads");
+const { setPosts } = require("../controller/post.controller");
 const router = express.Router();
 
 router.get("/", (req, res) => {
     res.json({message: "données"})
 })
 
-router.post("/", (req, res) => {
-    res.json({message: req.body.message,
-        author: req.body.author
-    })
-})
+router.post("/", setPosts);
 
 router.put('/:id', (req, res) => {
     res.json({messageId: req.params.id})
