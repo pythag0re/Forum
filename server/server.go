@@ -109,7 +109,7 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 		Email:    email,
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/profile.html"))
+	tmpl := template.Must(template.ParseFiles("_templates_/prrofile.html"))
 	tmpl.Execute(w, data)
 
 }
