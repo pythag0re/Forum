@@ -17,26 +17,72 @@ func InitDB() {
 	if err != nil {
 		log.Fatal("Erreur de connexion à SQLite:", err)
 	}
-	fmt.Println("✅ Connexion à SQLite réussie !")
+	fmt.Println("Connexion à SQLite réussie !")
 
 	migrate()
 }
 
 func migrate() {
 	query := `
-	CREATE TABLE IF NOT EXISTS Users (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		email TEXT NOT NULL UNIQUE,
-		password TEXT NOT NULL,
-		pseudo TEXT NOT NULL UNIQUE
-	);
-	`
+-- users
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL UNIQUE,
+  pseudo TEXT NOT NULL UNIQUE,
+  password TEXT NOT NULL,
+  profile_picture TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- sessions
+CREATE TABLE IF NOT EXISTS sessions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  token TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- posts
+CREATE TABLE IF NOT EXISTS posts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- comments
+CREATE TABLE IF NOT EXISTS comments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  post_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL,
+  content TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- likes
+CREATE TABLE IF NOT EXISTS likes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  post_id INTEGER,
+  comment_id INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
+  FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE
+);
+`
 
 	_, err := DB.Exec(query)
 	if err != nil {
-		log.Fatal("❌ Erreur lors de la migration :", err)
+		log.Fatal("Erreur lors de la migration :", err)
 	}
-	fmt.Println("✅ Table 'Users' créée ou déjà existante.")
+	fmt.Println("Table créée ou déjà existante.")
 }
 
 func RegisterUser(email, pseudo, password string) error {
@@ -46,7 +92,7 @@ func RegisterUser(email, pseudo, password string) error {
 		return err
 	}
 	if exists > 0 {
-		return errors.New("🔁 Email ou pseudo déjà utilisé")
+		return errors.New("Email ou pseudo déjà utilisé")
 	}
 
 	stmt, err := DB.Prepare("INSERT INTO Users (email, password, pseudo) VALUES (?, ?, ?)")
@@ -60,7 +106,7 @@ func RegisterUser(email, pseudo, password string) error {
 		return err
 	}
 
-	fmt.Println("✅ Utilisateur inscrit avec succès :", pseudo)
+	fmt.Println("Utilisateur inscrit avec succès :", pseudo)
 	return nil
 }
 
@@ -68,9 +114,9 @@ func CloseDB() {
 	if DB != nil {
 		err := DB.Close()
 		if err != nil {
-			log.Println("⚠️ Erreur lors de la fermeture de la base :", err)
+			log.Println("Erreur lors de la fermeture de la base :", err)
 		} else {
-			fmt.Println("🔒 Connexion SQLite fermée.")
+			fmt.Println("Connexion SQLite fermée.")
 		}
 	}
 }

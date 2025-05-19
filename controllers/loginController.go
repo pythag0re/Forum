@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/db"
-	"log"
+	"forum/utils"
+	"golang.org/x/crypto/bcrypt"
+	"html/template"
 	"net/http"
 )
 
@@ -23,34 +25,50 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	pseudo := r.FormValue("pseudo")
 	password := r.FormValue("password")
 
+	var userID int
 	var storedPseudo, storedPassword string
-	query := "SELECT pseudo, password FROM users WHERE pseudo = ?"
-	err = db.DB.QueryRow(query, pseudo).Scan(&storedPseudo, &storedPassword)
-	fmt.Println("cherche le pseudo :", pseudo)
+
+	query := "SELECT id, pseudo, password FROM users WHERE pseudo = ?"
+	err = db.DB.QueryRow(query, pseudo).Scan(&userID, &storedPseudo, &storedPassword)
 
 	if err == sql.ErrNoRows {
-		http.Redirect(w, r, "/register", http.StatusSeeOther)
-		fmt.Println("Utilisateur introuvable. Redirection vers l'inscription.")
+		fmt.Println("Pseudo introuvable")
+		renderLoginWithError(w, "User doesn't exist. Please sign up.")
 		return
 	} else if err != nil {
-		log.Println("Database error:", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	if storedPassword != password {
-		http.Error(w, "Mot de passe incorrect", http.StatusUnauthorized)
-		fmt.Println("Mot de passe incorrect")
+	err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(password))
+	if err != nil {
+		renderLoginWithError(w, "Incorrect password.")
 		return
 	}
-	cookie := &http.Cookie{
-		Name:     "pseudo",
-		Value:    pseudo,
+
+	sessionToken := utils.GenerateSessionToken()
+	_, err = db.DB.Exec("INSERT INTO sessions (user_id, token) VALUES (?, ?)", userID, sessionToken)
+	if err != nil {
+		http.Error(w, "Session error", http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    sessionToken,
 		Path:     "/",
 		HttpOnly: true,
-	}
-	http.SetCookie(w, cookie)
+	})
 
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
-	fmt.Println("Connexion réussie, go vers le forum")
+	http.Redirect(w, r, "/landing", http.StatusSeeOther)
+}
+
+func renderLoginWithError(w http.ResponseWriter, errorMsg string) {
+	tmpl := template.Must(template.ParseFiles("_templates_/login.html"))
+	data := struct {
+		Error string
+	}{
+		Error: errorMsg,
+	}
+	tmpl.Execute(w, data)
 }
