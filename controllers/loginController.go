@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/db"
+	"forum/utils"
 	"log"
 	"net/http"
 )
@@ -23,10 +24,12 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	pseudo := r.FormValue("pseudo")
 	password := r.FormValue("password")
 
+	var userID int
 	var storedPseudo, storedPassword string
-	query := "SELECT pseudo, password FROM users WHERE pseudo = ?"
-	err = db.DB.QueryRow(query, pseudo).Scan(&storedPseudo, &storedPassword)
-	fmt.Println("cherche le pseudo :", pseudo)
+
+	query := "SELECT id, pseudo, password FROM users WHERE pseudo = ?"
+	err = db.DB.QueryRow(query, pseudo).Scan(&userID, &storedPseudo, &storedPassword)
+	fmt.Println("Recherche du pseudo :", pseudo)
 
 	if err == sql.ErrNoRows {
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
@@ -39,18 +42,29 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if storedPassword != password {
-		http.Error(w, "Mot de passe incorrect", http.StatusUnauthorized)
+		http.Error(w, "Incorrect password", http.StatusUnauthorized)
 		fmt.Println("Mot de passe incorrect")
 		return
 	}
-	cookie := &http.Cookie{
-		Name:     "pseudo",
-		Value:    pseudo,
+
+	sessionToken := utils.GenerateSessionToken()
+
+	
+	_, err = db.DB.Exec("INSERT INTO sessions (user_id, token) VALUES (?, ?)", userID, sessionToken)
+	if err != nil {
+		log.Println("Erreur lors de l'insertion du token :", err)
+		http.Error(w, "Erreur de session", http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    sessionToken,
 		Path:     "/",
 		HttpOnly: true,
-	}
-	http.SetCookie(w, cookie)
+	})
 
-	http.Redirect(w, r, "/home", http.StatusSeeOther)
-	fmt.Println("Connexion réussie, go vers le forum")
+	http.Redirect(w, r, "/landing", http.StatusSeeOther)
+	fmt.Println("Connexion réussie. Redirection vers le forum.")
 }
+

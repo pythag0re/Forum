@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"forum/controllers"
 	"forum/db"
+	"forum/utils"
 	"html"
 	"net/http"
 	"text/template"
@@ -77,6 +78,33 @@ func landingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func profileHandler(w http.ResponseWriter, r *http.Request) {
+	ok, userID := utils.IsAuthenticated(r)
+	if !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	var pseudo, email string
+	err := db.DB.QueryRow("SELECT pseudo, email FROM users WHERE id = ?", userID).Scan(&pseudo, &email)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		Username string
+		Email    string
+	}{
+		Username: pseudo,
+		Email:    email,
+	}
+
+	tmpl := template.Must(template.ParseFiles("_templates_/profile.html"))
+	tmpl.Execute(w, data)
+
+}
+
 func Start() {
 	db.InitDB()
 	defer db.CloseDB()
@@ -92,6 +120,7 @@ func Start() {
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/landing", landingHandler)
+	http.HandleFunc("/profile", profileHandler)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)

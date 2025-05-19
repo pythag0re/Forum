@@ -28,7 +28,6 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	hashedPassword, _ := HashPassword(password)
 
-	// Vérification pseudo déjà pris
 	var existingPseudo string
 	queryCheck := "SELECT pseudo FROM users WHERE pseudo = ?"
 	err = db.DB.QueryRow(queryCheck, pseudo).Scan(&existingPseudo)
