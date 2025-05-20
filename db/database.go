@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS likes (
 	if err != nil {
 		log.Fatal("Erreur lors de la migration :", err)
 	}
-	fmt.Println("Table créée ou déjà existante.")
+	fmt.Println("✅ Table 'Users' créée ou déjà existante.")
 }
 
 func RegisterUser(email, pseudo, password string) error {
@@ -110,13 +110,39 @@ func RegisterUser(email, pseudo, password string) error {
 	return nil
 }
 
+func UpdateUserProfile(userID int, email, pseudo string) error {
+	stmt, err := DB.Prepare(`
+		UPDATE Users 
+		SET email = ?, pseudo = ?
+		WHERE id = ?
+	`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(email, pseudo, userID)
+	return err
+}
+
+func DeleteUserByID(userID int) error {
+	stmt, err := DB.Prepare("DELETE FROM Users WHERE id = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(userID)
+	return err
+}
+
 func CloseDB() {
 	if DB != nil {
 		err := DB.Close()
 		if err != nil {
 			log.Println("Erreur lors de la fermeture de la base :", err)
 		} else {
-			fmt.Println("Connexion SQLite fermée.")
+			fmt.Println("🔒 Connexion SQLite fermée.")
 		}
 	}
 }
