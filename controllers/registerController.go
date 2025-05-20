@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"database/sql"
 	"forum/db"
-	"html/template"
 	"log"
 	"net/http"
 	"strings"
@@ -26,55 +24,37 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	pseudo := r.FormValue("pseudo")
 	password := r.FormValue("password")
-	confirmPassword := r.FormValue("confirm_password")
-
-	if password != confirmPassword {
-		renderRegisterWithError(w, "Passwords do not match.")
-		return
-	}
-
 	if len(password) < 8 || len(password) > 20 ||
 		!strings.ContainsAny(password, "0123456789") ||
 		!strings.ContainsAny(password, "abcdefghijklmnopqrstuvwxyz") ||
 		!strings.ContainsAny(password, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
-		renderRegisterWithError(w, "Password must be 8–20 characters long and include upper, lower and digit.")
+		http.Error(w, "Weak password. Must be 8–20 chars, include upper, lower, and number.", http.StatusBadRequest)
 		return
 	}
 
+	
 	var existing string
 	err = db.DB.QueryRow(`SELECT pseudo FROM users WHERE pseudo = ?`, pseudo).Scan(&existing)
 	if err == nil {
-		renderRegisterWithError(w, "Username already taken.")
-		return
-	} else if err != sql.ErrNoRows {
-		log.Println("DB error:", err)
-		http.Error(w, "Server error", http.StatusInternalServerError)
+		http.Error(w, "Username already taken.", http.StatusConflict)
 		return
 	}
 
-	// Hasher et insérer
 	hashed, err := HashPassword(password)
 	if err != nil {
-		renderRegisterWithError(w, "Internal error during password hashing.")
+		http.Error(w, "Internal error.", http.StatusInternalServerError)
+		log.Println("Hash error:", err)
 		return
 	}
 
-	_, err = db.DB.Exec(`INSERT INTO users (email, pseudo, password) VALUES (?, ?, ?)`, email, pseudo, hashed)
+	_, err = db.DB.Exec(`
+		INSERT INTO users (email, pseudo, password, profile_picture) 
+		VALUES (?, ?, ?, ?)`, email, pseudo, hashed, "")
 	if err != nil {
 		log.Println("DB insert error:", err)
-		renderRegisterWithError(w, "Could not create account.")
+		http.Error(w, "Error creating account.", http.StatusInternalServerError)
 		return
 	}
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
-}
-
-func renderRegisterWithError(w http.ResponseWriter, errorMsg string) {
-	tmpl := template.Must(template.ParseFiles("_templates_/register.html"))
-	data := struct {
-		Error string
-	}{
-		Error: errorMsg,
-	}
-	tmpl.Execute(w, data)
 }

@@ -94,24 +94,38 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var pseudo, email string
-	err := db.DB.QueryRow("SELECT pseudo, email FROM users WHERE id = ?", userID).Scan(&pseudo, &email)
+	var pseudo, email, profilePic string
+	var createdAt string
+
+	err := db.DB.QueryRow(`
+		SELECT pseudo, email, profile_picture, created_at 
+		FROM users 
+		WHERE id = ?`, userID).
+		Scan(&pseudo, &email, &profilePic, &createdAt)
+
 	if err != nil {
 		http.Error(w, "User not found", http.StatusInternalServerError)
 		return
 	}
 
+	if profilePic == "" {
+		profilePic = "avatar.png"
+	}
+
 	data := struct {
-		Username string
-		Email    string
+		Username    string
+		Email       string
+		ProfilePic  string
+		MemberSince string
 	}{
-		Username: pseudo,
-		Email:    email,
+		Username:    pseudo,
+		Email:       email,
+		ProfilePic:  profilePic,
+		MemberSince: createdAt,
 	}
 
 	tmpl := template.Must(template.ParseFiles("_templates_/prrofile.html"))
 	tmpl.Execute(w, data)
-
 }
 
 func Start() {
@@ -119,7 +133,9 @@ func Start() {
 	defer db.CloseDB()
 
 	http.Handle("/css/", http.StripPrefix("/css", http.FileServer(http.Dir("_templates_/css"))))
-	http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("_templates_/"))))
+	//http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("_templates_/"))))
+	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("_templates_/uploads"))))
+
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/landing", http.StatusSeeOther)
