@@ -27,7 +27,7 @@
             <div class="nav-group">
               <ul>
                 <li><a href="/posts"><i class="fa-solid fa-list"></i><span>Posts</span></a></li>
-                <li><a href="/profile"><i class="fa-solid fa-user"></i><span>Profile</span></a></li>
+                <li><a href="/profil"><i class="fa-solid fa-user"></i><span>Profile</span></a></li>
                 <li><a href="/network"><i class="fa-solid fa-users"></i><span>Network</span></a></li>
                 <li><a href="/logout"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a></li>
               </ul>
@@ -43,8 +43,7 @@
           <section class="left">
             <h2>Mon Profil</h2>
             <div class="box">
-              <!-- Formulaire de mise à jour -->
-              <form action="/profile" method="POST" enctype="multipart/form-data">
+              <form action="/profil" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                   <label for="profilePic">Photo de profil</label>
                   <input type="file" id="profilePic" name="profilePic" accept="image/*" />
@@ -67,8 +66,7 @@
                 </div>
               </form>
 
-              <!-- Formulaire de suppression -->
-              <form action="/delete-profile" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre profil ? Cette action est irréversible.')">
+              <form action="/delete-profil" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre profil ? Cette action est irréversible.')">
                 <button type="submit" class="btn btn-red" style="margin-top: 1rem; background-color: #888;">
                   <i class="fa-solid fa-trash"></i> Supprimer mon profil
                 </button>

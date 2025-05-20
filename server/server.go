@@ -110,7 +110,7 @@ func Start() {
 	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/landing", landingHandler)
 	http.HandleFunc("/profil", ProfilHandler)
-	http.HandleFunc("/delete-profile", controllers.DeleteProfile)
+	http.HandleFunc("/delete-profil", controllers.DeleteProfile)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
