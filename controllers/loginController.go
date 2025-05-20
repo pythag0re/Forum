@@ -2,23 +2,22 @@ package controllers
 
 import (
 	"database/sql"
-	"fmt"
 	"forum/db"
 	"forum/utils"
-	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func LoginUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 		return
 	}
 
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "Invalid form data", http.StatusBadRequest)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Données de formulaire invalides", http.StatusBadRequest)
 		return
 	}
 
@@ -29,27 +28,26 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	var storedPseudo, storedPassword string
 
 	query := "SELECT id, pseudo, password FROM users WHERE pseudo = ?"
-	err = db.DB.QueryRow(query, pseudo).Scan(&userID, &storedPseudo, &storedPassword)
+	err := db.DB.QueryRow(query, pseudo).Scan(&userID, &storedPseudo, &storedPassword)
 
 	if err == sql.ErrNoRows {
-		fmt.Println("Pseudo introuvable")
-		renderLoginWithError(w, "User doesn't exist. Please sign up.")
+		renderLoginWithError(w, "Utilisateur introuvable. Veuillez vous inscrire.")
 		return
 	} else if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "Erreur serveur interne", http.StatusInternalServerError)
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(password))
 	if err != nil {
-		renderLoginWithError(w, "Incorrect password.")
+		renderLoginWithError(w, "Mot de passe incorrect.")
 		return
 	}
 
 	sessionToken := utils.GenerateSessionToken()
 	_, err = db.DB.Exec("INSERT INTO sessions (user_id, token) VALUES (?, ?)", userID, sessionToken)
 	if err != nil {
-		http.Error(w, "Session error", http.StatusInternalServerError)
+		http.Error(w, "Erreur de session", http.StatusInternalServerError)
 		return
 	}
 
