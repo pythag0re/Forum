@@ -11,30 +11,34 @@
   <div class="wrapper active"> 
     <span class="rotate-bg"></span>
     <span class="rotate-bg2"></span>
-
     <div class="form-box register">
       <h2 class="title">Sign Up</h2>
-      <form action="/register" method="POST">
-        <div class="input-box">
-          <input type="text"name="pseudo" required />
-          <label>Username</label>
-          <i class='bx bxs-user'></i>
-        </div>
-        <div class="input-box">
-          <input type="email" name="email" required />
-          <label>Email</label>
-          <i class='bx bxs-envelope'></i>
-        </div>
-        <div class="input-box">
-          <input type="password" name="password" required />
-          <label>Password</label>
-          <i class='bx bxs-lock-alt'></i>
-        </div>
-        <button type="submit" class="btn">Sign Up</button>
-        <div class="linkTxt">
-          <p>Already have an account? <a href="/login">Login</a></p>
-        </div>
-      </form>
+    <form action="/register" method="POST">
+      <div class="input-box">
+        <input type="text" name="pseudo" required />
+        <label>Username</label>
+        <i class='bx bxs-user'></i>
+      </div>
+      <div class="input-box">
+        <input type="email" name="email" required />
+        <label>Email</label>
+        <i class='bx bxs-envelope'></i>
+      </div>
+      <div class="input-box">
+        <input type="password" name="password" required />
+        <label>Password</label>
+        <i class='bx bxs-lock-alt'></i>
+      </div>
+      <div class="input-box">
+        <input type="password" name="confirm_password" required />
+        <label>Confirm Password</label>
+        <i class='bx bxs-lock-alt'></i>
+      </div>
+      <button type="submit" class="btn">Sign Up</button>
+      <div class="linkTxt">
+        <p>Already have an account? <a href="/login">Login</a></p>
+      </div>
+    </form>
     </div>
   </div>
 </body>

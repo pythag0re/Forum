@@ -21,7 +21,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		fmt.Printf("erreur de template %s:", err)
+		fmt.Printf("Erreur de template : %s\n", err)
 	}
 }
 
@@ -38,12 +38,10 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		err := tmpl.Execute(w, nil)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Printf("erreur de template : %s\n", err)
+			fmt.Printf("Erreur de template : %s\n", err)
 		}
-
 	case http.MethodPost:
 		controllers.LoginUser(w, r)
-
 	default:
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 	}
@@ -56,15 +54,18 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == http.MethodGet {
+	switch r.Method {
+	case http.MethodGet:
 		tmpl := template.Must(template.ParseFiles("_templates_/register.html"))
 		err := tmpl.Execute(w, nil)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Printf("erreur de template %s:", err)
+			fmt.Printf("Erreur de template : %s\n", err)
 		}
-	} else if r.Method == http.MethodPost {
+	case http.MethodPost:
 		controllers.RegisterUser(w, r)
+	default:
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -80,29 +81,34 @@ func landingHandler(w http.ResponseWriter, r *http.Request) {
 		err := tmpl.Execute(w, nil)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Printf("erreur de template %s:", err)
+			fmt.Printf("Erreur de template : %s\n", err)
 		}
+	} else {
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 	}
 }
 
-func ProfilHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/profil" {
-		http.NotFound(w, r)
-		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
-		return
-	}
+// func profilHandler(w http.ResponseWriter, r *http.Request) {
+// 	if r.URL.Path != "/profil" {
+// 		http.NotFound(w, r)
+// 		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
+// 		return
+// 	}
 
-	if r.Method == http.MethodGet {
-		tmpl := template.Must(template.ParseFiles("_templates_/profil.html"))
-		err := tmpl.Execute(w, nil)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Printf("erreur de template %s:", err)
-		} else if r.Method == http.MethodPost {
-			controllers.UpdateProfile(w, r)
-		}
-	}
-}
+// 	switch r.Method {
+// 	case http.MethodGet:
+// 		tmpl := template.Must(template.ParseFiles("_templates_/profil.html"))
+// 		err := tmpl.Execute(w, nil)
+// 		if err != nil {
+// 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+// 			fmt.Printf("Erreur de template : %s\n", err)
+// 		}
+// 	case http.MethodPost:
+// 		controllers.UpdateProfile(w, r)
+// 	default:
+// 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+// 	}
+// }
 
 func profileHandler(w http.ResponseWriter, r *http.Request) {
 	ok, userID := utils.IsAuthenticated(r)
@@ -114,7 +120,7 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 	var pseudo, email string
 	err := db.DB.QueryRow("SELECT pseudo, email FROM users WHERE id = ?", userID).Scan(&pseudo, &email)
 	if err != nil {
-		http.Error(w, "User not found", http.StatusInternalServerError)
+		http.Error(w, "Utilisateur introuvable", http.StatusInternalServerError)
 		return
 	}
 
@@ -126,9 +132,12 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 		Email:    email,
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/prrofile.html"))
-	tmpl.Execute(w, data)
-
+	tmpl := template.Must(template.ParseFiles("_templates_/profil.html"))
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Erreur d'affichage", http.StatusInternalServerError)
+		fmt.Printf("Erreur de template : %s\n", err)
+	}
 }
 
 func Start() {
@@ -146,9 +155,10 @@ func Start() {
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/landing", landingHandler)
-	http.HandleFunc("/profil", ProfilHandler)
+	//http.HandleFunc("/profil", profilHandler)
+	http.HandleFunc("/profil", profileHandler)
 	http.HandleFunc("/delete-profil", controllers.DeleteProfile)
 
-	fmt.Println("Serveur démarré sur le port 8080 ")
+	fmt.Println("Serveur démarré sur le port 8080")
 	http.ListenAndServe(":8080", nil)
 }

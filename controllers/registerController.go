@@ -52,7 +52,6 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Hasher et insérer
 	hashed, err := HashPassword(password)
 	if err != nil {
 		renderRegisterWithError(w, "Internal error during password hashing.")
