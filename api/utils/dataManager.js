@@ -14,13 +14,29 @@ let db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
 
 // Exécuter une requête SELECT
 db.serialize(() => {
-    db.each(`SELECT email, pseudo FROM Users`, (err, row) => {
+    db.each(`SELECT email, password, pseudo FROM Users`, (err, row) => {
         if (err) {
             console.error(err.message);
         }
-        console.log(`${row.email}: ${row.pseudo}`);
+        console.log(`${row.email}:${row.pseudo}`);
     });
 });
+
+function updateLike() {
+    const createdAt = new Date().toISOString();
+    db.run(
+        `INSERT INTO likes (id, user_id, post_id, comment_id, created_at) VALUES (?, ?, ?, ?, ?)`,
+        ['1', '1', '5', 'malik', createdAt],
+        function (err) {
+            if (err) {
+                console.error("Erreur d'insertion :", err.message);
+            } else {
+                console.log(`Like inséré avec l'id ${this.lastID}`);
+            }
+        }
+    );
+}
+updateLike();
 
 // Fermer la base de données
 db.close((err) => {
@@ -31,4 +47,7 @@ db.close((err) => {
     }
 });
 
-module.exports = {db}
+
+
+
+module.exports = { db }
