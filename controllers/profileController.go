@@ -3,6 +3,7 @@ package controllers
 import (
 	"forum/db"
 	"forum/utils"
+	"log"
 	"net/http"
 
 	"golang.org/x/crypto/bcrypt"
@@ -82,4 +83,38 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, expiredCookie)
 
 	http.Redirect(w, r, "/landing", http.StatusSeeOther)
+}
+
+func DeleteProfileHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ok, userID := utils.IsAuthenticated(r)
+	if !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	_, err := db.DB.Exec("DELETE FROM users WHERE id = ?", userID)
+	if err != nil {
+		log.Println("Erreur lors de la suppression du profil:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	_, err = db.DB.Exec("DELETE FROM sessions WHERE user_id = ?", userID)
+	if err != nil {
+		log.Println("Erreur lors de la suppression de la session:", err)
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:   "session_token",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	})
+
+	http.Redirect(w, r, "/register", http.StatusSeeOther)
 }

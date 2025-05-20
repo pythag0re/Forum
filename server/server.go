@@ -6,7 +6,11 @@ import (
 	"forum/db"
 	"forum/utils"
 	"html"
+	"io"
+	"log"
 	"net/http"
+	"os"
+	"path"
 	"text/template"
 )
 
@@ -94,13 +98,55 @@ func profileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var pseudo, email, profilePic string
-	var createdAt string
+	if r.Method == http.MethodPost {
+		r.ParseMultipartForm(10 << 20)
 
-	err := db.DB.QueryRow(`
-		SELECT pseudo, email, profile_picture, created_at 
-		FROM users 
-		WHERE id = ?`, userID).
+		action := r.FormValue("action")
+
+		switch action {
+		case "change_photo":
+			file, handler, err := r.FormFile("profilePic")
+			if err == nil {
+				defer file.Close()
+				filename := fmt.Sprintf("user%d_%s", userID, handler.Filename)
+				filePath := path.Join("_templates_/uploads", filename)
+
+				dst, err := os.Create(filePath)
+				if err == nil {
+					defer dst.Close()
+					io.Copy(dst, file)
+
+					_, err = db.DB.Exec("UPDATE users SET profile_picture = ? WHERE id = ?", filename, userID)
+					if err != nil {
+						log.Println("Erreur update photo:", err)
+					}
+				}
+			}
+
+		case "change_username":
+			newPseudo := r.FormValue("username")
+			if newPseudo != "" {
+				_, err := db.DB.Exec("UPDATE users SET pseudo = ? WHERE id = ?", newPseudo, userID)
+				if err != nil {
+					log.Println("Erreur update pseudo:", err)
+				}
+			}
+
+		case "change_email":
+			newEmail := r.FormValue("email")
+			if newEmail != "" {
+				_, err := db.DB.Exec("UPDATE users SET email = ? WHERE id = ?", newEmail, userID)
+				if err != nil {
+					log.Println("Erreur update email:", err)
+				}
+			}
+		}
+
+		http.Redirect(w, r, "/profile", http.StatusSeeOther)
+		return
+	}
+	var pseudo, email, profilePic, createdAt string
+	err := db.DB.QueryRow(`SELECT pseudo, email, profile_picture, created_at FROM users WHERE id = ?`, userID).
 		Scan(&pseudo, &email, &profilePic, &createdAt)
 
 	if err != nil {
@@ -136,7 +182,6 @@ func Start() {
 	//http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("_templates_/"))))
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("_templates_/uploads"))))
 
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/landing", http.StatusSeeOther)
 	})
@@ -147,6 +192,7 @@ func Start() {
 	http.HandleFunc("/landing", landingHandler)
 	http.HandleFunc("/profile", profileHandler)
 	http.HandleFunc("/logout", controllers.LogoutHandler)
+	http.HandleFunc("/delete-profile", controllers.DeleteProfileHandler)
 	http.HandleFunc("/change-password", controllers.ChangePasswordHandler)
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
