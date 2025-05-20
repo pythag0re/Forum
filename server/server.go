@@ -49,6 +49,32 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	_, err = db.DB.Exec("DELETE FROM sessions WHERE token = ?", cookie.Value)
+	if err != nil {
+		http.Error(w, "Failed to logout", http.StatusInternalServerError)
+		return
+	}
+
+	expiredCookie := &http.Cookie{
+		Name:     "session_token",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   -1,
+	}
+	http.SetCookie(w, expiredCookie)
+
+	http.Redirect(w, r, "/landing", http.StatusSeeOther)
+}
+
 func registerHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/register" {
 		http.NotFound(w, r)
@@ -130,6 +156,7 @@ func Start() {
 	http.HandleFunc("/home", homeHandler)
 	http.HandleFunc("/landing", landingHandler)
 	http.HandleFunc("/profile", profileHandler)
+	http.HandleFunc("/logout", logoutHandler)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
