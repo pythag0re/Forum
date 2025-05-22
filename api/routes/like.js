@@ -13,7 +13,7 @@ router.get("/:id", likeController.read);
 router.post("/", likeController.create);
 
 // Modifier un likee
-router.put("/:id", likeController.update);
+router.put("/:id", likeController.updatelike);
 
 // Supprimer un likee
 router.delete("/:id", likeController.remove);

@@ -23,10 +23,11 @@ function create(req, res) {
     res.status(400).json({ message: "Erreur lors de l'insertion" });
 }
 
-function update(req, res) {
+function updatelike(req, res) {
   const likeId = req.params.id;
   const datas = req.body;
   const updatedlike = likeService.update(likeId, datas);
+  console.log(update)
   if (updatedlike) {
     res.status(200).json({ message: "like édité" });
   } else {
@@ -48,6 +49,6 @@ module.exports = {
   list,
   read,
   create,
-  update,
+  updatelike,
   remove
 };
