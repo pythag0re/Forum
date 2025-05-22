@@ -1,0 +1,99 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  background: #f5f5f5;
+  color: #333;
+}
+
+.header {
+  background: #000;
+  color: #fff;
+  padding: 15px 0;
+}
+
+.header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1100px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+.logo img {
+  height: 40px;
+}
+
+.nav ul {
+  display: flex;
+  list-style: none;
+  gap: 25px;
+}
+
+.nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+main .container {
+  max-width: 900px;
+  margin: auto;
+  padding: 40px 20px;
+}
+
+h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.create-post {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.btn {
+  background: #17a;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn:hover {
+  background: #0e5b82;
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.post {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.post h2 {
+  margin-top: 0;
+}
+
+.meta {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 10px;
+}
+
+footer {
+  background: #000;
+  color: #fff;
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+}
+
