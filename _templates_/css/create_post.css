@@ -1,0 +1,100 @@
+:root {
+  --white: #fff;
+  --black: #000;
+  --blue: #2e86de;
+  --grey: #eee;
+  --text: #333;
+}
+
+body {
+  background: var(--grey);
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 600px;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: var(--text);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.tips {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.tips ul {
+  padding-left: 20px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-post {
+  background: var(--blue);
+  color: white;
+}
+
+.btn-post:hover {
+  background: #1b4f72;
+}
+
+.btn-cancel {
+  background: #ccc;
+  color: #222;
+}
+
+.btn-cancel:hover {
+  background: #bbb;
+}

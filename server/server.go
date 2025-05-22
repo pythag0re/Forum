@@ -91,6 +91,41 @@ func landingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func createPostHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		tmpl := template.Must(template.ParseFiles("_templates_/create_post.html"))
+		tmpl.Execute(w, nil)
+	} else if r.Method == http.MethodPost {
+		err := r.ParseForm()
+		if err != nil {
+			http.Error(w, "Invalid form data", http.StatusBadRequest)
+			return
+		}
+
+		title := r.FormValue("title")
+		body := r.FormValue("body")
+
+		ok, userID := utils.IsAuthenticated(r)
+		if !ok {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		_, err = db.DB.Exec(`
+			INSERT INTO posts (title, body, user_id, created_at) 
+			VALUES (?, ?, ?, datetime('now'))`, title, body, userID)
+
+		if err != nil {
+			log.Println("Erreur d'insertion du post :", err)
+			http.Error(w, "Error creating post", http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, "/landing", http.StatusSeeOther)
+	}
+}
+
+
 func profileHandler(w http.ResponseWriter, r *http.Request) {
 	ok, userID := utils.IsAuthenticated(r)
 	if !ok {
@@ -194,6 +229,7 @@ func Start() {
 	http.HandleFunc("/logout", controllers.LogoutHandler)
 	http.HandleFunc("/delete-profile", controllers.DeleteProfileHandler)
 	http.HandleFunc("/change-password", controllers.ChangePasswordHandler)
+	http.HandleFunc("/create-post", createPostHandler)
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
 }
