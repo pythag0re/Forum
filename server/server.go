@@ -14,14 +14,14 @@ import (
 	"text/template"
 )
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/home" {
+func postHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/posts" {
 		http.NotFound(w, r)
 		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("_templates_/home.html"))
+	tmpl := template.Must(template.ParseFiles("_templates_/posts.html"))
 	err := tmpl.Execute(w, nil)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -179,7 +179,6 @@ func Start() {
 	defer db.CloseDB()
 
 	http.Handle("/css/", http.StripPrefix("/css", http.FileServer(http.Dir("_templates_/css"))))
-	//http.Handle("/public/", http.StripPrefix("/public/", http.FileServer(http.Dir("_templates_/"))))
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("_templates_/uploads"))))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -188,7 +187,7 @@ func Start() {
 
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/home", homeHandler)
+	http.HandleFunc("/posts", postHandler)
 	http.HandleFunc("/landing", landingHandler)
 	http.HandleFunc("/profile", profileHandler)
 	http.HandleFunc("/logout", controllers.LogoutHandler)
