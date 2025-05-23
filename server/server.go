@@ -103,7 +103,7 @@ func createPostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		title := r.FormValue("title")
-		body := r.FormValue("body")
+		content := r.FormValue("content")
 
 		ok, userID := utils.IsAuthenticated(r)
 		if !ok {
@@ -112,8 +112,8 @@ func createPostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		_, err = db.DB.Exec(`
-			INSERT INTO posts (title, body, user_id, created_at) 
-			VALUES (?, ?, ?, datetime('now'))`, title, body, userID)
+			INSERT INTO posts (title, content, user_id, created_at) 
+			VALUES (?, ?, ?, datetime('now'))`, title, content, userID)
 
 		if err != nil {
 			log.Println("Erreur d'insertion du post :", err)

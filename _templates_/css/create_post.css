@@ -39,7 +39,8 @@ label {
   color: var(--text);
 }
 
-input, textarea {
+input[type="text"],
+textarea {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
@@ -68,6 +69,7 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 20px;
 }
 
 .btn {
@@ -97,4 +99,50 @@ textarea {
 
 .btn-cancel:hover {
   background: #bbb;
+}
+
+.image-upload {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.image-upload label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--blue);
+}
+
+.image-upload input[type="file"] {
+  display: none;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.file-upload-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.btn-upload {
+  background: transparent;
+  border: none;
+  color: var(--blue);
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  padding: 0;
+}
+
+.btn-upload i {
+  font-size: 16px;
 }
