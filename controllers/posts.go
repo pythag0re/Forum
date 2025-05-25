@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"forum/db"
+	"forum/utils"
 	"html/template"
 	"log"
 	"net/http"
@@ -18,6 +19,12 @@ type PostData struct {
 }
 
 func PostsHandler(w http.ResponseWriter, r *http.Request) {
+
+	ok, _ := utils.IsAuthenticated(r)
+	if !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 	rows, err := db.DB.Query(`
 		SELECT posts.id, posts.title, posts.content, users.pseudo, posts.created_at,
 			(SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) as like_count,
