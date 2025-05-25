@@ -230,6 +230,7 @@ func Start() {
 	http.HandleFunc("/delete-profile", controllers.DeleteProfileHandler)
 	http.HandleFunc("/change-password", controllers.ChangePasswordHandler)
 	http.HandleFunc("/create-post", createPostHandler)
+	http.HandleFunc("/posts", controllers.PostsHandler)
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
 }
