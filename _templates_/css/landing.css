@@ -265,3 +265,25 @@ footer ul li a {
   text-decoration: none;
   font-weight: 500;
 }
+
+.create-post-button {
+  margin-left: auto; 
+}
+
+.btn-create-post {
+  background-color: #000 ;
+  padding: 8px 16px;
+  border-radius: 25px;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.3s;
+  border: none;
+}
+
+.btn-create-post:hover {
+  background-color: #e07b00;
+}
