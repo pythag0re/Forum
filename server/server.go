@@ -214,6 +214,7 @@ func Start() {
 	http.HandleFunc("/change-password", controllers.ChangePasswordHandler)
 	http.HandleFunc("/create-post", createPostHandler)
 	http.HandleFunc("/posts", controllers.PostsHandler)
+	http.HandleFunc("/post", controllers.PostDetailHandler)
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
 }
