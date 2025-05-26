@@ -48,9 +48,7 @@
           <a href="/post?id={{.ID}}" class="post-link">
             <div class="post">
               <h2 class="post-title">{{.Title}}</h2>
-              <p class="meta">
-                By <strong>{{.Author}}</strong> — {{.CreatedAt}}
-              </p>
+              <p class="meta">By <a href="/user/{{.UserID}}"><strong>{{.Author}}</strong></a> — {{.CreatedAt}}</p>
               <p class="content">{{.Content}}</p>
               <div class="post-info">
                 <span

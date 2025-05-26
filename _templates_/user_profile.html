@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{.Pseudo}}'s Profile</title>
+  <link rel="stylesheet" href="/css/user_profile.css">
+</head>
+<body>
+  <div class="profile-container">
+    <div class="profile-header">
+      <img src="/public/uploads/{{.ProfilePic}}" alt="Profile picture">
+      <h2>{{.Pseudo}}</h2>
+      <p>🕓 Member since: {{.MemberSince}}</p>
+    </div>
+
+    <div class="stats">
+      <p>📝 Posts: {{.PostCount}}</p>
+      <p>💬 Comments: {{.CommentCount}}</p>
+    </div>
+
+    <div class="suggestions">
+      <h3>🔎 Other members to explore</h3>
+      <p>Coming soon...</p>
+    </div>
+  </div>
+</body>
+</html>
