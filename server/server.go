@@ -14,20 +14,6 @@ import (
 	"text/template"
 )
 
-func postHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/post" {
-		http.NotFound(w, r)
-		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
-		return
-	}
-
-	tmpl := template.Must(template.ParseFiles("_templates_/posts.html"))
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		fmt.Printf("erreur de template %s:", err)
-	}
-}
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/login" {
@@ -221,7 +207,6 @@ func Start() {
 
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/post", postHandler)
 	http.HandleFunc("/landing", landingHandler)
 	http.HandleFunc("/profile", profileHandler)
 	http.HandleFunc("/logout", controllers.LogoutHandler)
