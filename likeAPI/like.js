@@ -65,3 +65,16 @@ app.get('/', (req, res) => {
 app.listen(3001, () => {
   console.log('API Likes SQLite démarrée sur http://localhost:3001');
 });
+
+app.get('/like/has-liked', (req, res) => {
+  const { user_id, post_id } = req.query;
+
+  db.get(
+    `SELECT COUNT(*) as count FROM likes WHERE user_id = ? AND post_id = ?`,
+    [user_id, post_id],
+    (err, row) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ liked: row.count > 0 });
+    }
+  );
+});

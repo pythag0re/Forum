@@ -38,7 +38,10 @@
           <p class="meta">By <strong>{{.Author}}</strong> — {{.CreatedAt}}</p>
           <p class="content">{{.Content}}</p> 
           <div class="post-info">
-            <span><i class="fa-solid fa-thumbs-up"></i> {{.Likes}} Likes</span>
+            <span><i class="fa-solid fa-thumbs-up"></i> <span class="like-count">{{.Likes}}</span> Likes</span>
+            <button class="like-btn" data-post-id="{{.ID}}">
+              <i class="fa-regular fa-thumbs-up"></i> Like
+            </button>
             <span><i class="fa-solid fa-comment"></i> {{.Comments}} Comments</span>
           </div>
         </div>
@@ -54,6 +57,38 @@
       <p>© 2025 Community Forum – Powered by community.</p>
     </div>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const userId = sessionStorage.getItem('user_id'); // suppose que user_id est stocké après login
+
+      if (!userId) {
+        console.warn('Utilisateur non identifié, like désactivé.');
+        return;
+      }
+
+      document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          const postId = button.getAttribute('data-post-id');
+
+          fetch('http://localhost:3001/like', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_id: userId,
+              post_id: postId
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            console.log(data.message);
+            location.reload(); // ou mettre à jour dynamiquement le compteur de likes
+          })
+          .catch(error => console.error('Erreur:', error));
+        });
+      });
+    });
+  </script>
 
 </body>
 </html>

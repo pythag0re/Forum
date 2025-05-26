@@ -15,7 +15,7 @@ import (
 )
 
 func postHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/posts" {
+	if r.URL.Path != "/post" {
 		http.NotFound(w, r)
 		fmt.Printf("Error: handler for %s not found\n", html.EscapeString(r.URL.Path))
 		return
@@ -125,7 +125,6 @@ func createPostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
 func profileHandler(w http.ResponseWriter, r *http.Request) {
 	ok, userID := utils.IsAuthenticated(r)
 	if !ok {
@@ -222,7 +221,7 @@ func Start() {
 
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/posts", postHandler)
+	http.HandleFunc("/post", postHandler)
 	http.HandleFunc("/landing", landingHandler)
 	http.HandleFunc("/profile", profileHandler)
 	http.HandleFunc("/logout", controllers.LogoutHandler)
