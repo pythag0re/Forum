@@ -3,6 +3,7 @@ package controllers
 import (
 	"forum/db"
 	"forum/utils"
+	"html/template"
 	"log"
 	"net/http"
 
@@ -117,4 +118,37 @@ func DeleteProfileHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	http.Redirect(w, r, "/register", http.StatusSeeOther)
+}
+
+func MyPostsHandler(w http.ResponseWriter, r *http.Request) {
+	ok, userID := utils.IsAuthenticated(r)
+	if !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	rows, err := db.DB.Query(`
+		SELECT id, title, content, created_at 
+		FROM posts 
+		WHERE user_id = ? 
+		ORDER BY created_at DESC`, userID)
+	if err != nil {
+		log.Println("Erreur récupération de mes posts :", err)
+		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	var posts []PostData
+	for rows.Next() {
+		var p PostData
+		p.Author = "You" // facultatif
+		err := rows.Scan(&p.ID, &p.Title, &p.Content, &p.CreatedAt)
+		if err == nil {
+			posts = append(posts, p)
+		}
+	}
+
+	tmpl := template.Must(template.ParseFiles("_templates_/my_posts.html"))
+	tmpl.Execute(w, posts)
 }
