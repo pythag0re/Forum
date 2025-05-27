@@ -1,27 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{{.Pseudo}}'s Profile</title>
-  <link rel="stylesheet" href="/css/user_profile.css">
+  <link rel="stylesheet" href="/css/user_profile.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
-  <div class="profile-container">
-    <div class="profile-header">
-      <img src="/public/uploads/{{.ProfilePic}}" alt="Profile picture">
-      <h2>{{.Pseudo}}</h2>
-      <p>🕓 Member since: {{.MemberSince}}</p>
-    </div>
 
-    <div class="stats">
-      <p>📝 Posts: {{.PostCount}}</p>
-      <p>💬 Comments: {{.CommentCount}}</p>
+  <header class="header">
+    <div class="container header-content">
+      <div class="logo">
+        <a href="/landing"><img src="/imgs/logo.png" alt="Forum Logo" /></a>
+      </div>
+      <nav class="nav">
+        <ul>
+          <li><a href="/posts"><i class="fa-solid fa-list"></i> Posts</a></li>
+          <li><a href="/profile"><i class="fa-solid fa-user"></i> Profile</a></li>
+          <li><a href="/landing"><i class="fa-solid fa-right-from-bracket"></i> Exit</a></li>
+        </ul>
+      </nav>
     </div>
+  </header>
 
-    <div class="suggestions">
-      <h3>🔎 Other members to explore</h3>
-      <p>Coming soon...</p>
+  <main class="container">
+    <div class="profile-box">
+      <div class="profile-header">
+        <img src="/public/uploads/{{.ProfilePic}}" alt="Profile picture" class="profile-image">
+        <div class="user-info">
+          <h2>{{.Pseudo}}</h2>
+          <p>🕓 Member since: {{.MemberSince}}</p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <p><i class="fa-solid fa-pen"></i> Posts: <strong>{{.PostCount}}</strong></p>
+        <p><i class="fa-solid fa-comments"></i> Comments: <strong>{{.CommentCount}}</strong></p>
+      </div>
+
+      <div class="suggestions" style="visibility: hidden;">
+        <h3>🔎 Other members to explore</h3>
+        <p>Coming soon...</p>
+      </div>
     </div>
-  </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© 2025 Community Forum – Powered by the people.</p>
+    </div>
+  </footer>
+
 </body>
 </html>
+
