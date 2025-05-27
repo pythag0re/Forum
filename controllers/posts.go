@@ -57,3 +57,31 @@ func PostsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Erreur template posts:", err)
 	}
 }
+
+func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ok, userID := utils.IsAuthenticated(r)
+	if !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	postID := r.FormValue("post_id")
+	if postID == "" {
+		http.Error(w, "ID de post manquant", http.StatusBadRequest)
+		return
+	}
+	_, err := db.DB.Exec("DELETE FROM posts WHERE id = ? AND user_id = ?", postID, userID)
+	if err != nil {
+		log.Println("Erreur lors de la suppression du post :", err)
+		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/my-posts", http.StatusSeeOther)
+}
+
