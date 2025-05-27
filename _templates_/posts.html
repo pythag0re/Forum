@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>All Posts</title>
     <link rel="stylesheet" href="css/posts.css" />
+    <script src="../likeAPI/like-handler.js"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -73,37 +74,5 @@
         <p>© 2025 Community Forum – Powered by community.</p>
       </div>
     </footer>
-
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const userId = sessionStorage.getItem("user_id"); // suppose que user_id est stocké après login
-
-        if (!userId) {
-          console.warn("Utilisateur non identifié, like désactivé.");
-          return;
-        }
-
-        document.querySelectorAll(".like-btn").forEach((button) => {
-          button.addEventListener("click", () => {
-            const postId = button.getAttribute("data-post-id");
-
-            fetch("http://localhost:3001/like", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                user_id: userId,
-                post_id: postId,
-              }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                console.log(data.message);
-                location.reload(); // ou mettre à jour dynamiquement le compteur de likes
-              })
-              .catch((error) => console.error("Erreur:", error));
-          });
-        });
-      });
-    </script>
   </body>
 </html>

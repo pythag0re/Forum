@@ -14,7 +14,6 @@ import (
 	"text/template"
 )
 
-
 func loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/login" {
 		http.NotFound(w, r)
@@ -200,6 +199,7 @@ func Start() {
 
 	http.Handle("/css/", http.StripPrefix("/css", http.FileServer(http.Dir("_templates_/css"))))
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("_templates_/uploads"))))
+	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("likeAPI"))))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/landing", http.StatusSeeOther)
