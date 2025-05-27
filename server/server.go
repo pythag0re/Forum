@@ -80,8 +80,26 @@ func landingHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodGet {
+		isAuthenticated, userID := utils.IsAuthenticated(r)
+		data := struct {
+			IsAuthenticated bool
+			UserID          int
+			Username        string
+		}{
+			IsAuthenticated: isAuthenticated,
+			UserID:          userID,
+		}
+
+		if isAuthenticated {
+			var username string
+			err := db.DB.QueryRow("SELECT pseudo FROM users WHERE id = ?", userID).Scan(&username)
+			if err == nil {
+				data.Username = username
+			}
+		}
+
 		tmpl := template.Must(template.ParseFiles("_templates_/landing.html"))
-		err := tmpl.Execute(w, nil)
+		err := tmpl.Execute(w, data)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			fmt.Printf("erreur de template %s:", err)
