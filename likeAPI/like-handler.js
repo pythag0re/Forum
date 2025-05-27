@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const userId = getCookie('user_id');
   if (!userId) {
-    console.warn("utilisateur non connecté.");
+    console.warn("Utilisateur non connecté.");
     return;
   }
 
@@ -16,12 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const likeBtn = postElement.querySelector('.like-btn');
     const likeCount = postElement.querySelector('.like-count');
 
+    if (!likeBtn || !likeCount || !postId) return;
+
     fetch(`http://localhost:3001/like/has-liked?user_id=${userId}&post_id=${postId}`)
       .then(res => res.json())
       .then(data => {
         if (data.liked) {
           likeBtn.innerHTML = '<i class="fa-solid fa-thumbs-up"></i> Unlike';
           likeBtn.dataset.liked = "true";
+        } else {
+          likeBtn.dataset.liked = "false";
         }
       });
 
@@ -33,8 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
         method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: userId,
-          post_id: postId
+          user_id: parseInt(userId),
+          post_id: parseInt(postId)
         })
       })
       .then(() => {

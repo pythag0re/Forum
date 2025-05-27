@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"forum/db"
 	"forum/utils"
-	"golang.org/x/crypto/bcrypt"
 	"html/template"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func LoginUser(w http.ResponseWriter, r *http.Request) {
@@ -53,11 +54,20 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// cookie session_token
 	http.SetCookie(w, &http.Cookie{
 		Name:     "session_token",
 		Value:    sessionToken,
 		Path:     "/",
 		HttpOnly: true,
+	})
+
+	// cookie user id
+	http.SetCookie(w, &http.Cookie{
+		Name:     "user_id",
+		Value:    fmt.Sprintf("%d", userID),
+		Path:     "/",
+		HttpOnly: false, // Important : JS peut y accéder
 	})
 
 	http.Redirect(w, r, "/landing", http.StatusSeeOther)
