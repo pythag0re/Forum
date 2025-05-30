@@ -9,7 +9,6 @@ import (
 )
 
 
-
 func PublicProfileHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/user/")
 	userID, err := strconv.Atoi(idStr)
