@@ -218,6 +218,9 @@ func Start() {
 	http.HandleFunc("/user/", controllers.PublicProfileHandler)
 	http.HandleFunc("/my-posts", controllers.MyPostsHandler)
 	http.HandleFunc("/delete-post", controllers.DeletePostHandler)
+	http.HandleFunc("/edit-post", controllers.EditPostHandler)
+    http.HandleFunc("/update-post", controllers.UpdatePostHandler)
+
 
 
 	fmt.Println("Serveur démarré sur le port 8080 ")

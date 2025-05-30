@@ -85,3 +85,62 @@ func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/my-posts", http.StatusSeeOther)
 }
 
+func EditPostHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Redirect(w, r, "/landing", http.StatusSeeOther)
+		return
+	}
+
+	id := r.URL.Query().Get("id")
+	if id == "" {
+		http.Error(w, "Post ID is missing", http.StatusBadRequest)
+		return
+	}
+
+	var title, content string
+	err := db.DB.QueryRow("SELECT title, content FROM posts WHERE id = ?", id).Scan(&title, &content)
+	if err != nil {
+		http.Error(w, "Post not found", http.StatusNotFound)
+		return
+	}
+
+	data := struct {
+		ID      string
+		Title   string
+		Content string
+	}{
+		ID:      id,
+		Title:   title,
+		Content: content,
+	}
+
+	tmpl := template.Must(template.ParseFiles("_templates_/edit_post.html"))
+	tmpl.Execute(w, data)
+}
+
+func UpdatePostHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/landing", http.StatusSeeOther)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	id := r.FormValue("id")
+	title := r.FormValue("title")
+	content := r.FormValue("content")
+
+	_, err = db.DB.Exec("UPDATE posts SET title = ?, content = ? WHERE id = ?", title, content, id)
+	if err != nil {
+		http.Error(w, "Error updating post", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/my-posts", http.StatusSeeOther)
+}
+
+
