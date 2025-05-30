@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Comments</title>
+  <link rel="stylesheet" href="css/profile.css" />
+  <link rel="stylesheet" href="css/posts.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-content">
+      <div class="logo">
+        <a href="/landing"><img src="imgs/logo.png" alt="Forum Logo" /></a>
+      </div>
+      <nav class="nav">
+        <ul>
+          <li><a href="/posts"><i class="fa-solid fa-list"></i> Posts</a></li>
+          <li><a href="/my-posts"><i class="fa-solid fa-pen"></i> My Posts</a></li>
+          <li><a href="/profile"><i class="fa-solid fa-user"></i> Profile</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h2>🗨️ My Comments</h2>
+      {{range .}}
+        <div class="comment-box">
+          <p><strong>Post:</strong> <a href="/post?id={{.PostID}}">{{.PostTitle}}</a></p>
+          <p>{{.Content}}</p>
+          <p><em>{{.CreatedAt}}</em></p>
+
+          <form action="/edit-comment" method="POST" style="display:inline;">
+            <input type="hidden" name="id" value="{{.CommentID}}" />
+            <button type="submit" class="btn btn-edit">✏️ Edit</button>
+          </form>
+
+          <form action="/delete-comment" method="POST" style="display:inline;" onsubmit="return confirm('Delete this comment?');">
+            <input type="hidden" name="id" value="{{.CommentID}}" />
+            <button type="submit" class="btn btn-delete">🗑️ Delete</button>
+          </form>
+          <hr>
+        </div>
+      {{else}}
+        <p>You haven’t written any comments yet.</p>
+      {{end}}
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© 2025 Community Forum – All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
