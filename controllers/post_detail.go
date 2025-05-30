@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"forum/db"
+	"forum/utils"
 	"html/template"
 	"net/http"
 )
@@ -61,5 +62,40 @@ func PostDetailHandler(w http.ResponseWriter, r *http.Request) {
   tmpl.Execute(w, post)
 }
 
+func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/landing", http.StatusSeeOther)
+		return
+	}
 
+	ok, userID := utils.IsAuthenticated(r)
+	if !ok {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Invalid form", http.StatusBadRequest)
+		return
+	}
+
+	postID := r.FormValue("post_id")
+	content := r.FormValue("comment")
+
+	if postID == "" || content == "" {
+		http.Error(w, "Missing comment content or post ID", http.StatusBadRequest)
+		return
+	}
+
+	_, err = db.DB.Exec(`
+		INSERT INTO comments (user_id, post_id, content, created_at) 
+		VALUES (?, ?, ?, datetime('now'))`, userID, postID, content)
+
+	if err != nil {
+		http.Error(w, "Unable to save comment", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/post?id="+postID, http.StatusSeeOther)
+}
