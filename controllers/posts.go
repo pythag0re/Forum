@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"forum/db"
 	"forum/utils"
 	"html/template"
@@ -26,13 +27,30 @@ func PostsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows, err := db.DB.Query(`
-		SELECT posts.id, posts.title, posts.content, users.pseudo, users.id, posts.created_at,
-			(SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) as like_count,
-			(SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) as comment_count
-		FROM posts
-		JOIN users ON posts.user_id = users.id
-		ORDER BY posts.created_at DESC`)
+	query := r.URL.Query().Get("q")
+	var rows *sql.Rows
+	var err error
+
+	if query != "" {
+		search := "%" + query + "%"
+		rows, err = db.DB.Query(`
+			SELECT posts.id, posts.title, posts.content, users.pseudo, users.id, posts.created_at,
+				(SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) as like_count,
+				(SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) as comment_count
+			FROM posts
+			JOIN users ON posts.user_id = users.id
+			WHERE posts.title LIKE ? OR posts.content LIKE ? OR users.pseudo LIKE ?
+			ORDER BY posts.created_at DESC`, search, search, search)
+	} else {
+		rows, err = db.DB.Query(`
+			SELECT posts.id, posts.title, posts.content, users.pseudo, users.id, posts.created_at,
+				(SELECT COUNT(*) FROM likes WHERE likes.post_id = posts.id) as like_count,
+				(SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) as comment_count
+			FROM posts
+			JOIN users ON posts.user_id = users.id
+			ORDER BY posts.created_at DESC`)
+	}
+
 	if err != nil {
 		log.Println("Erreur lors de la récupération des posts:", err)
 		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
@@ -57,6 +75,7 @@ func PostsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Erreur template posts:", err)
 	}
 }
+
 
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
