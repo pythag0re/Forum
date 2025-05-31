@@ -1,56 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>{{.Pseudo}}'s Profile</title>
-  <link rel="stylesheet" href="/css/user_profile.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-</head>
-<body>
-
-  <header class="header">
-    <div class="container header-content">
-      <div class="logo">
-        <a href="/landing"><img src="/imgs/logo.png" alt="Forum Logo" /></a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{.Pseudo}}'s Profile</title>
+    <link rel="stylesheet" href="/css/user_profile.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header-content">
+        <div class="logo">
+          <a href="/landing"><img src="/imgs/logo.png" alt="Forum Logo" /></a>
+        </div>
+        <nav class="nav">
+          <ul>
+            <li>
+              <a href="/posts"><i class="fa-solid fa-list"></i> Posts</a>
+            </li>
+            <li>
+              <a href="/profile"><i class="fa-solid fa-user"></i> Profile</a>
+            </li>
+            <li>
+              <a href="/landing"
+                ><i class="fa-solid fa-right-from-bracket"></i> Exit</a
+              >
+            </li>
+          </ul>
+        </nav>
       </div>
-      <nav class="nav">
-        <ul>
-          <li><a href="/posts"><i class="fa-solid fa-list"></i> Posts</a></li>
-          <li><a href="/profile"><i class="fa-solid fa-user"></i> Profile</a></li>
-          <li><a href="/landing"><i class="fa-solid fa-right-from-bracket"></i> Exit</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+    </header>
 
-  <main class="container">
-    <div class="profile-box">
-      <div class="profile-header">
-        <img src="/uploads/{{.ProfilePic}}" alt="Profile picture" class="profile-image">
-        <div class="user-info">
-          <h2>{{.Pseudo}}</h2>
-          <p>🕓 Member since: {{.MemberSince}}</p>
+    <main class="container">
+      <div class="profile-box">
+        <div class="profile-header">
+          <img
+            src="/uploads/{{.ProfilePic}}"
+            alt="Profile picture"
+            class="profile-image"
+          />
+          <div class="user-info">
+            <h2>{{.Pseudo}}</h2>
+            <p>🕓 Member since: {{.MemberSince}}</p>
+          </div>
+        </div>
+
+        <div class="stats">
+          <p>
+            <i class="fa-solid fa-pen"></i> Posts:
+            <strong>{{.PostCount}}</strong>
+          </p>
+          <p>
+            <i class="fa-solid fa-comments"></i> Comments:
+            <strong>{{.CommentCount}}</strong>
+          </p>
+        </div>
+
+        <div class="profile-links" style="margin-top: 20px">
+          {{if .IsOwner}}
+          <a href="/my-posts" class="btn btn-red"
+            ><i class="fa-solid fa-file-lines"></i> My Posts</a
+          >
+          <a href="/my-comments" class="btn btn-red"
+            ><i class="fa-solid fa-comments"></i> My Comments</a
+          >
+          {{else}}
+          <a href="/user-posts?id={{.ID}}" class="btn btn-red"
+            ><i class="fa-solid fa-file-lines"></i> View Posts</a
+          >
+          <a href="/user-comments?id={{.ID}}" class="btn btn-red"
+            ><i class="fa-solid fa-comments"></i> View Comments</a
+          >
+          {{end}}
+          <a href="/user-likes?id={{.ID}}" class="btn btn-red"
+            ><i class="fa-solid fa-heart"></i> Liked Posts</a
+          >
+        </div>
+
+        <div class="suggestions" style="visibility: hidden">
+          <h3>🔎 Other members to explore</h3>
+          <p>Coming soon...</p>
         </div>
       </div>
+    </main>
 
-      <div class="stats">
-        <p><i class="fa-solid fa-pen"></i> Posts: <strong>{{.PostCount}}</strong></p>
-        <p><i class="fa-solid fa-comments"></i> Comments: <strong>{{.CommentCount}}</strong></p>
+    <footer>
+      <div class="container">
+        <p>© 2025 Community Forum – Powered by the people.</p>
       </div>
-
-      <div class="suggestions" style="visibility: hidden;">
-        <h3>🔎 Other members to explore</h3>
-        <p>Coming soon...</p>
-      </div>
-    </div>
-  </main>
-
-  <footer>
-    <div class="container">
-      <p>© 2025 Community Forum – Powered by the people.</p>
-    </div>
-  </footer>
-
-</body>
+    </footer>
+  </body>
 </html>

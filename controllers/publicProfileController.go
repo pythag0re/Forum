@@ -4,6 +4,7 @@ import (
 	"forum/db"
 	"html/template"
 	"net/http"
+	"forum/utils"
 	"strconv"
 	"strings"
 )
@@ -16,6 +17,8 @@ func PublicProfileHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+	authenticated, currentUserID := utils.IsAuthenticated(r)
+	isOwner := authenticated && currentUserID == userID
 
 	var pseudo, photo, createdAt string
 	var postCount, commentCount int
@@ -37,17 +40,21 @@ func PublicProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Pseudo       string
-		ProfilePic   string
-		MemberSince  string
-		PostCount    int
-		CommentCount int
+		ID            int
+		Pseudo        string
+		ProfilePic    string
+		MemberSince   string
+		PostCount     int
+		CommentCount  int
+		IsOwner       bool
 	}{
-		Pseudo:       pseudo,
-		ProfilePic:   photo,
-		MemberSince:  createdAt,
-		PostCount:    postCount,
-		CommentCount: commentCount,
+		ID:            userID,
+		Pseudo:        pseudo,
+		ProfilePic:    photo,
+		MemberSince:   createdAt,
+		PostCount:     postCount,
+		CommentCount:  commentCount,
+		IsOwner:       isOwner,
 	}
 
 	tmpl := template.Must(template.ParseFiles("_templates_/user_profile.html"))
