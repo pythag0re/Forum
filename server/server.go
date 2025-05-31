@@ -226,6 +226,8 @@ func Start() {
 	http.HandleFunc("/delete-comment", controllers.DeleteCommentHandler)
 	http.HandleFunc("/update-comment", controllers.UpdateCommentHandler)
 	http.HandleFunc("/user-posts", controllers.UserPostsHandler)
+	http.HandleFunc("/user-comments", controllers.UserCommentsHandler)
+
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
 }

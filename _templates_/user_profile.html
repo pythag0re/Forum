@@ -62,16 +62,19 @@
         <div class="profile-links" style="margin-top: 20px">
           {{if .IsOwner}}
           <a href="/my-posts" class="btn btn-red"
-            ><i class="fa-solid fa-pen-to-square"></i> Manage My Posts</a
+            ><i class="fa-solid fa-file-lines"></i> My Posts</a
+          >
+          <a href="/my-comments" class="btn btn-red"
+            ><i class="fa-solid fa-comments"></i> My Comments</a
           >
           {{else}}
           <a href="/user-posts?id={{.ID}}" class="btn btn-red"
             ><i class="fa-solid fa-file-lines"></i> View Posts</a
           >
-          {{end}}
           <a href="/user-comments?id={{.ID}}" class="btn btn-red"
             ><i class="fa-solid fa-comments"></i> View Comments</a
           >
+          {{end}}
           <a href="/user-likes?id={{.ID}}" class="btn btn-red"
             ><i class="fa-solid fa-heart"></i> Liked Posts</a
           >
