@@ -21,11 +21,11 @@ type PostData struct {
 }
 
 func PostsHandler(w http.ResponseWriter, r *http.Request) {
-	ok, _ := utils.IsAuthenticated(r)
-	if !ok {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
+	// ok, _ := utils.IsAuthenticated(r)
+	// if !ok {
+	// 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	// 	return
+	// }
 
 	query := r.URL.Query().Get("q")
 	var rows *sql.Rows
