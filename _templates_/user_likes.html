@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Liked Posts</title>
+  <link rel="stylesheet" href="/css/posts.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-content">
+      <div class="logo">
+        <a href="/landing"><img src="/imgs/logo.png" alt="Forum Logo" /></a>
+      </div>
+      <nav class="nav">
+        <ul>
+          <li><a href="/posts">Posts</a></li>
+          <li><a href="/profile">Profile</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h2>❤️ Posts Liked by User</h2>
+
+    {{range .}}
+      <div class="post">
+        <h3>{{.Title}}</h3>
+        <p><strong>By:</strong> {{.Author}} | {{.CreatedAt}}</p>
+        <p>{{.Content}}</p>
+        <a href="/post?id={{.ID}}" class="btn">View Post</a>
+      </div>
+    {{else}}
+      <p>No liked posts found.</p>
+    {{end}}
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© 2025 Community Forum</p>
+    </div>
+  </footer>
+</body>
+</html>

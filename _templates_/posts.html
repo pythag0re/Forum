@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Posts</title>
+    <link rel="stylesheet" href="/css/posts.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header-content">
+        <div class="logo">
+          <a href="/landing"><img src="/imgs/logo.png" alt="Forum Logo" /></a>
+        </div>
+        <form action="/posts" method="GET" class="search-form">
+          <input type="text" name="q" placeholder="Search posts..." />
+          <button type="submit"><i class="fa fa-search"></i></button>
+        </form>
+        <nav class="nav">
+          <ul>
+            <li><a href="/posts"><i class="fa-solid fa-list"></i> Posts</a></li>
+            <li><a href="/profile"><i class="fa-solid fa-user"></i> Profile</a></li>
+            <li><a href="/landing"><i class="fa-solid fa-right-from-bracket"></i> Exit</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <div class="page-header">
+          <h1>📝 All Posts</h1>
+          <a href="/create-post" class="btn-create">
+            <i class="fa-solid fa-plus"></i> Create New Post
+          </a>
+        </div>
+
+        <div class="posts">
+          {{range .}}
+          <div class="post" data-post-id="{{.ID}}">
+            <h2 class="post-title">
+              <a href="/post?id={{.ID}}">{{.Title}}</a>
+            </h2>
+            <p class="meta">
+              By <a href="/user/{{.UserID}}"><strong>{{.Author}}</strong></a> — {{.CreatedAt}}
+            </p>
+            <p class="content">{{.Content}}</p>
+            <div class="post-info">
+              <span class="like-count">{{.Likes}}</span> Likes
+              <button class="like-btn"><i class="fa-regular fa-thumbs-up"></i> Like</button>
+              <span><i class="fa-solid fa-comment"></i> {{.Comments}} Comments</span>
+            </div>
+          </div>
+          {{else}}
+          <p>No posts available yet.</p>
+          {{end}}
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p>© 2025 Community Forum – Powered by community.</p>
+      </div>
+    </footer>
+
+<script>
+  document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      const postDiv = e.target.closest('.post');
+      const postId = postDiv.getAttribute('data-post-id');
+      const likeCountSpan = postDiv.querySelector('.like-count');
+      const likeIcon = btn.querySelector('i');
+
+      const userID = 1;
+
+      try {
+        const res = await fetch('/like', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({user_id: userID, post_id: parseInt(postId)})
+        });
+
+        if (!res.ok) {
+          alert('Erreur lors du like');
+          return;
+        }
+
+        const data = await res.json();
+        let count = parseInt(likeCountSpan.textContent) || 0;
+
+        if (data.liked) {
+          likeCountSpan.textContent = count + 1;
+          likeIcon.classList.replace('fa-regular', 'fa-solid');
+        } else {
+          likeCountSpan.textContent = Math.max(0, count - 1);
+          likeIcon.classList.replace('fa-solid', 'fa-regular');
+        }
+      } catch (err) {
+        alert('Erreur réseau');
+      }
+    });
+  });
+</script>
+
+  </body>
+</html>

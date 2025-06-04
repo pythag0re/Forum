@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Comments</title>
+  <link rel="stylesheet" href="/css/posts.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="container header-content">
+    <div class="logo">
+      <a href="/landing"><img src="/imgs/logo.png" alt="Forum Logo" /></a>
+    </div>
+    <nav class="nav">
+      <ul>
+        <li><a href="/posts"><i class="fa-solid fa-list"></i> Posts</a></li>
+        <li><a href="/profile"><i class="fa-solid fa-user"></i> Profile</a></li>
+        <li><a href="/landing"><i class="fa-solid fa-right-from-bracket"></i> Exit</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <h1>💬 Comments on Posts</h1>
+
+    {{range .}}
+    <div class="comment-box">
+      <h3>On Post: <a href="/post?id={{.PostID}}">{{.PostTitle}}</a></h3>
+      <p><strong>{{.CreatedAt}}</strong></p>
+      <p>{{.Content}}</p>
+
+      {{if .IsOwner}}
+      <div style="margin-top: 10px;">
+        <form action="/edit-comment" method="GET" style="display:inline;">
+          <input type="hidden" name="id" value="{{.CommentID}}">
+          <button class="btn btn-edit" type="submit"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+        </form>
+
+        <form action="/delete-comment" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure?');">
+          <input type="hidden" name="id" value="{{.CommentID}}">
+          <button class="btn btn-delete" type="submit"><i class="fa-solid fa-trash"></i> Delete</button>
+        </form>
+      </div>
+      {{end}}
+
+    </div>
+    <hr>
+    {{else}}
+    <p>This user hasn’t commented yet.</p>
+    {{end}}
+
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <p>© 2025 Community Forum – All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

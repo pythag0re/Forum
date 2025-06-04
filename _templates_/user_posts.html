@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User's Posts</title>
+  <link rel="stylesheet" href="/css/posts.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="container header-content">
+    <div class="logo">
+      <a href="/landing"><img src="/imgs/logo.png" alt="Forum Logo" /></a>
+    </div>
+    <nav class="nav">
+      <ul>
+        <li><a href="/posts"><i class="fa-solid fa-list"></i> Posts</a></li>
+        <li><a href="/profile"><i class="fa-solid fa-user"></i> Profile</a></li>
+        <li><a href="/posts"><i class="fa-solid fa-right-from-bracket"></i> Exit</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="page-header">
+      <h1>📖 User's Posts</h1>
+    </div>
+
+    <div class="posts">
+      {{range .}}
+      <div class="post">
+        <h2 class="post-title"><a href="/post?id={{.ID}}">{{.Title}}</a></h2>
+        <p class="meta">Published on {{.CreatedAt}}</p>
+        <p class="content">{{.Content}}</p>
+      </div>
+      {{else}}
+      <p>This user hasn’t posted anything yet.</p>
+      {{end}}
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <p>© 2025 Community Forum – Powered by you.</p>
+  </div>
+</footer>
+
+</body>
+</html>
