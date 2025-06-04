@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"forum/controllers"
 	"forum/db"
@@ -108,6 +109,54 @@ func createPostHandler(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/landing", http.StatusSeeOther)
 	}
+}
+func likeHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req LikeRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Requête invalide", http.StatusBadRequest)
+		return
+	}
+
+	var count int
+	err = db.DB.QueryRow("SELECT COUNT(*) FROM likes WHERE user_id = ? AND post_id = ?", req.UserID, req.PostID).Scan(&count)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+		return
+	}
+
+	if count > 0 {
+		_, err = db.DB.Exec("DELETE FROM likes WHERE user_id = ? AND post_id = ?", req.UserID, req.PostID)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(LikeResponse{Liked: false})
+	} else {
+		_, err = db.DB.Exec("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", req.UserID, req.PostID)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(LikeResponse{Liked: true})
+	}
+}
+
+type LikeRequest struct {
+	UserID int `json:"user_id"`
+	PostID int `json:"post_id"`
+}
+
+type LikeResponse struct {
+	Liked bool `json:"liked"`
 }
 
 func profileHandler(w http.ResponseWriter, r *http.Request) {
@@ -227,6 +276,7 @@ func Start() {
 	http.HandleFunc("/update-comment", controllers.UpdateCommentHandler)
 	http.HandleFunc("/user-posts", controllers.UserPostsHandler)
 	http.HandleFunc("/user-comments", controllers.UserCommentsHandler)
+	http.HandleFunc("/like", likeHandler)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
 	http.ListenAndServe(":8080", nil)
