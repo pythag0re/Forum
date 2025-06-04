@@ -84,34 +84,10 @@
                     <span>2h ago</span>
                     <span>14 comments</span>
                   </div>
+                  <button class="like-button" data-post-id="1">🤍 Like</button>
                 </div>
               </div>
-              <div class="box">
-                <div class="img">
-                  <img src="imgs/post2.png" alt="Post Image" />
-                </div>
-                <div class="details">
-                  <h3>Best Tools for Web Development</h3>
-                  <div class="sub-details">
-                    <span>by marco99</span>
-                    <span>5h ago</span>
-                    <span>8 comments</span>
-                  </div>
-                </div>
-              </div>
-              <div class="box">
-                <div class="img">
-                  <img src="imgs/post3.png" alt="Post Image" />
-                </div>
-                <div class="details">
-                  <h3>What's Your Favorite Tech Stack?</h3>
-                  <div class="sub-details">
-                    <span>by devinspire</span>
-                    <span>1d ago</span>
-                    <span>23 comments</span>
-                  </div>
-                </div>
-              </div>
+              <!-- les autres posts ici -->
             </div>
           </section>
 
@@ -177,4 +153,23 @@
         </p>
       </div>
     </footer>
+
+    <script>
+      function isAuthenticated() {
+        return document.cookie.includes("session_token=");
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".like-button").forEach(button => {
+          button.addEventListener("click", function (e) {
+            if (!isAuthenticated()) {
+              e.preventDefault();
+              alert("vous devez être connecté pour liker");
+              return;
+            }
+          });
+        });
+      });
+    </script>
+  </body>
 </html>
