@@ -30,10 +30,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			fmt.Printf("erreur de template : %s\n", err)
 		}
-
 	case http.MethodPost:
 		controllers.LoginUser(w, r)
-
 	default:
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 	}
@@ -72,8 +70,6 @@ func landingHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			fmt.Printf("erreur de template %s:", err)
 		}
-	} else if r.Method == http.MethodPost {
-		controllers.RegisterUser(w, r)
 	}
 }
 
@@ -110,13 +106,24 @@ func createPostHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/landing", http.StatusSeeOther)
 	}
 }
+
 func likeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var req LikeRequest
+	// ✅ Vérifie si l'utilisateur est authentifié
+	auth, userID := utils.IsAuthenticated(r)
+	if !auth {
+		http.Error(w, "Non autorisé", http.StatusUnauthorized)
+		return
+	}
+
+	// ✅ Ne pas accepter le user_id depuis le client
+	var req struct {
+		PostID int `json:"post_id"`
+	}
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "Requête invalide", http.StatusBadRequest)
@@ -124,7 +131,7 @@ func likeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var count int
-	err = db.DB.QueryRow("SELECT COUNT(*) FROM likes WHERE user_id = ? AND post_id = ?", req.UserID, req.PostID).Scan(&count)
+	err = db.DB.QueryRow("SELECT COUNT(*) FROM likes WHERE user_id = ? AND post_id = ?", userID, req.PostID).Scan(&count)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
@@ -132,31 +139,26 @@ func likeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count > 0 {
-		_, err = db.DB.Exec("DELETE FROM likes WHERE user_id = ? AND post_id = ?", req.UserID, req.PostID)
+		_, err = db.DB.Exec("DELETE FROM likes WHERE user_id = ? AND post_id = ?", userID, req.PostID)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
 			return
 		}
-		json.NewEncoder(w).Encode(LikeResponse{Liked: false})
+		json.NewEncoder(w).Encode(struct {
+			Liked bool `json:"liked"`
+		}{Liked: false})
 	} else {
-		_, err = db.DB.Exec("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", req.UserID, req.PostID)
+		_, err = db.DB.Exec("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", userID, req.PostID)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
 			return
 		}
-		json.NewEncoder(w).Encode(LikeResponse{Liked: true})
+		json.NewEncoder(w).Encode(struct {
+			Liked bool `json:"liked"`
+		}{Liked: true})
 	}
-}
-
-type LikeRequest struct {
-	UserID int `json:"user_id"`
-	PostID int `json:"post_id"`
-}
-
-type LikeResponse struct {
-	Liked bool `json:"liked"`
 }
 
 func profileHandler(w http.ResponseWriter, r *http.Request) {
