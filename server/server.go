@@ -276,6 +276,7 @@ func Start() {
 	http.HandleFunc("/update-comment", controllers.UpdateCommentHandler)
 	http.HandleFunc("/user-posts", controllers.UserPostsHandler)
 	http.HandleFunc("/user-comments", controllers.UserCommentsHandler)
+	http.HandleFunc("/user-likes", controllers.UserLikedPostsHandler)
 	http.HandleFunc("/like", likeHandler)
 
 	fmt.Println("Serveur démarré sur le port 8080 ")
