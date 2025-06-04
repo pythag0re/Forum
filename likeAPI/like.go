@@ -27,7 +27,7 @@ func main() {
 			return
 		}
 
-		// Check if like exists
+		// verifier si le like existe
 		var count int
 		err := db.QueryRow("SELECT COUNT(*) FROM likes WHERE user_id=? AND post_id=?", body.UserID, body.PostID).Scan(&count)
 		if err != nil {
