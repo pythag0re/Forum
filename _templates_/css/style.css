@@ -1,9 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --white: #fff;
-  --black: #000;
-  --lightBulue: #17a;
+  --white: #ffffff;
+  --black: #000000;
+  --blue: #2e86de;
+  --blue-dark: #1b4f72;
+  --text: #2c3e50;
+  --grey: #e0e0e0;
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  --radius: 10px;
+  --transition: all 0.4s ease;
 }
 
 * {
@@ -19,6 +25,7 @@ body {
   align-items: center;
   min-height: 100vh;
   background: var(--white);
+  color: var(--text);
 }
 
 .wrapper {
@@ -27,8 +34,8 @@ body {
   height: 450px;
   background: var(--white);
   border: 2px solid var(--black);
-  border-radius: 10px;
-  box-shadow: 0 0 20px var(--black);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
 
@@ -38,7 +45,7 @@ body {
   right: 0;
   width: 850px;
   height: 600px;
-  background: #000;
+  background: var(--black);
   transform: rotate(10deg) skewY(40deg);
   transform-origin: bottom right;
   transition: 1.5s ease;
@@ -54,8 +61,7 @@ body {
   background: var(--white);
   transform: rotate(0) skewY(0);
   transform-origin: bottom left;
-  transition: 1.5s ease;
-  transition-delay: 0.5s;
+  transition: 1.5s ease 0.5s;
   z-index: -1;
 }
 
@@ -76,6 +82,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  transition: var(--transition);
 }
 
 .form-box.login {
@@ -98,10 +105,10 @@ body {
 }
 
 .title {
-  font-size: 32px;
+  font-size: 30px;
   color: var(--black);
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   position: relative;
 }
 
@@ -112,8 +119,9 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 40px;
-  height: 4px;
-  background: var(--black);
+  height: 3px;
+  background: var(--blue);
+  border-radius: 2px;
 }
 
 .input-box {
@@ -130,15 +138,15 @@ body {
   border: none;
   outline: none;
   border-bottom: 2px solid var(--black);
-  color: var(--black);
-  padding-right: 23px;
-  font-size: 16px;
-  font-weight: 500;
+  color: var(--text);
+  font-size: 15px;
+  padding-right: 25px;
+  transition: var(--transition);
 }
 
 .input-box input:focus,
 .input-box input:valid {
-  border-bottom-color: var(--lightBulue);
+  border-bottom-color: var(--blue);
 }
 
 .input-box label {
@@ -146,16 +154,17 @@ body {
   top: 50%;
   left: 0;
   transform: translateY(-50%);
-  font-size: 16px;
+  font-size: 15px;
   color: var(--black);
   pointer-events: none;
-  transition: 0.5s;
+  transition: 0.4s;
 }
 
 .input-box input:focus ~ label,
 .input-box input:valid ~ label {
-  top: -5px;
-  color: var(--lightBulue);
+  top: -8px;
+  font-size: 13px;
+  color: var(--blue);
 }
 
 .input-box i {
@@ -165,12 +174,12 @@ body {
   transform: translateY(-50%);
   font-size: 18px;
   color: var(--black);
-  transition: 0.5s;
+  transition: 0.4s;
 }
 
 .input-box input:focus ~ i,
 .input-box input:valid ~ i {
-  color: var(--lightBulue);
+  color: var(--blue);
 }
 
 button.btn {
@@ -182,54 +191,59 @@ button.btn {
   outline: none;
   border-radius: 40px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  transition: .3s;
+  transition: var(--transition);
 }
 
 button.btn:hover {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  background-color: var(--blue-dark);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
 
 .linkTxt {
   font-size: 14px;
-  color: var(--black);
+  color: var(--text);
   text-align: center;
   margin: 20px 0 10px;
 }
 
 .linkTxt a {
-  color: blue;
+  color: var(--blue);
   text-decoration: none;
   font-weight: 600;
+  transition: var(--transition);
 }
 
-/* Animations */
+.linkTxt a:hover {
+  text-decoration: underline;
+}
+
 .animation {
   transform: translateX(0);
   opacity: 1;
   filter: blur(0);
-  transition: 0.7s ease;
-  transition-delay: calc(.1s * var(--j));
+  transition: 0.6s ease;
+  transition-delay: calc(0.1s * var(--j));
 }
 
 .wrapper.active .form-box.login .animation {
-  transform: translateX(-120%);
+  transform: translateX(-100%);
   opacity: 0;
-  filter: blur(10px);
-  transition-delay: calc(.1s * var(--i));
+  filter: blur(8px);
+  transition-delay: calc(0.1s * var(--i));
 }
 
 .wrapper .form-box.register .animation {
-  transform: translateX(120%);
+  transform: translateX(100%);
   opacity: 0;
-  filter: blur(10px);
-  transition-delay: calc(.1s * var(--j));
+  filter: blur(8px);
+  transition-delay: calc(0.1s * var(--j));
 }
 
 .wrapper.active .form-box.register .animation {
   transform: translateX(0);
   opacity: 1;
   filter: blur(0);
-  transition-delay: calc(.1s * var(--i));
+  transition-delay: calc(0.1s * var(--i));
 }

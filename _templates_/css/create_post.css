@@ -1,31 +1,42 @@
 :root {
-  --white: #fff;
-  --black: #000;
-  --blue: #2e86de;
-  --grey: #eee;
-  --text: #333;
+  --white: #ffffff;
+  --black: #000000;
+  --primary: #2e86de;
+  --primary-dark: #1b4f72;
+  --grey-light: #f4f6f8;
+  --grey: #e0e0e0;
+  --text: #2c3e50;
+  --text-muted: #7f8c8d;
+  --border: #dcdcdc;
+  --radius: 8px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --transition: all 0.3s ease;
 }
 
 body {
-  background: var(--grey);
+  background: var(--grey-light);
   font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 40px 20px;
   display: flex;
   justify-content: center;
+  color: var(--text);
 }
 
 .container {
-  width: 600px;
+  width: 100%;
+  max-width: 640px;
   background: var(--white);
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  padding: 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
 }
 
 h2 {
-  margin-bottom: 20px;
-  color: var(--text);
+  margin-bottom: 24px;
+  color: var(--primary-dark);
+  font-size: 24px;
 }
 
 .form-group {
@@ -35,114 +46,117 @@ h2 {
 label {
   display: block;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   color: var(--text);
+  font-size: 15px;
 }
 
 input[type="text"],
 textarea {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   font-size: 15px;
+  background-color: #fff;
+  color: var(--text);
+  transition: var(--transition);
+}
+
+input[type="text"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(46, 134, 222, 0.15);
 }
 
 textarea {
   resize: vertical;
+  min-height: 120px;
 }
 
 .tips {
-  background: #f9f9f9;
-  padding: 15px;
-  border-radius: 6px;
+  background: #fefefe;
+  border: 1px solid var(--grey);
+  padding: 16px;
+  border-radius: var(--radius);
   font-size: 14px;
-  color: #444;
-  margin-bottom: 20px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.tips h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: var(--primary-dark);
+  font-size: 15px;
 }
 
 .tips ul {
   padding-left: 20px;
+  margin: 0;
+}
+
+.tips li {
+  margin-bottom: 6px;
 }
 
 .form-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 20px;
-}
-
-.btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 14px;
-  text-decoration: none;
-  text-align: center;
-}
-
-.btn-post {
-  background: var(--blue);
-  color: white;
-}
-
-.btn-post:hover {
-  background: #1b4f72;
-}
-
-.btn-cancel {
-  background: #ccc;
-  color: #222;
-}
-
-.btn-cancel:hover {
-  background: #bbb;
-}
-
-.image-upload {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 24px;
 }
 
 .image-upload label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-weight: 500;
   cursor: pointer;
-  color: var(--blue);
+  color: var(--primary);
+  font-size: 14px;
+  transition: var(--transition);
 }
 
-.image-upload input[type="file"] {
-  display: none;
+.image-upload label:hover {
+  color: var(--primary-dark);
+}
+
+.btn {
+  padding: 10px 24px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  transition: var(--transition);
+  border: none;
+}
+
+.btn-post {
+  background-color: var(--primary);
+  color: var(--white);
+}
+
+.btn-post:hover {
+  background-color: var(--primary-dark);
+}
+
+.btn-cancel {
+  background-color: #f0f0f0;
+  color: var(--text);
+}
+
+.btn-cancel:hover {
+  background-color: #e0e0e0;
 }
 
 .action-buttons {
   display: flex;
   gap: 10px;
-}
-
-.file-upload-wrapper {
-  display: flex;
-  align-items: center;
-}
-
-.btn-upload {
-  background: transparent;
-  border: none;
-  color: var(--blue);
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  padding: 0;
-}
-
-.btn-upload i {
-  font-size: 16px;
+  flex-wrap: wrap;
 }
