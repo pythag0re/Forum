@@ -65,17 +65,58 @@ func landingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == http.MethodGet {
-		tmpl := template.Must(template.ParseFiles("_templates_/landing.html"))
-		err := tmpl.Execute(w, nil)
+	switch r.Method {
+	case http.MethodGet:
+		rows, err := db.DB.Query(`
+			SELECT posts.id, posts.title, posts.content, users.pseudo, posts.created_at,
+				(SELECT COUNT(*) FROM comments WHERE comments.post_id = posts.id) AS comment_count
+			FROM posts
+			JOIN users ON posts.user_id = users.id
+			ORDER BY RANDOM()
+			LIMIT 3;
+		`)
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			fmt.Printf("erreur de template %s:", err)
+			log.Println("Erreur lors de la récupération des posts aléatoires:", err)
+			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+			return
 		}
-	} else if r.Method == http.MethodPost {
+		defer rows.Close()
+
+		type LandingPost struct {
+			ID           int
+			Title        string
+			Content      string
+			Author       string
+			CreatedAt    string
+			CommentCount int
+		}
+
+		var posts []LandingPost
+		for rows.Next() {
+			var post LandingPost
+			err := rows.Scan(&post.ID, &post.Title, &post.Content, &post.Author, &post.CreatedAt, &post.CommentCount)
+			if err != nil {
+				log.Println("Erreur lors du scan d’un post:", err)
+				continue
+			}
+			posts = append(posts, post)
+		}
+
+		tmpl := template.Must(template.ParseFiles("_templates_/landing.html"))
+		err = tmpl.Execute(w, posts)
+		if err != nil {
+			log.Printf("Erreur d’exécution du template landing: %v", err)
+			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+		}
+
+	case http.MethodPost:
 		controllers.RegisterUser(w, r)
+
+	default:
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 	}
 }
+
 
 func createPostHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
